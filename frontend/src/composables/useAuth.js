@@ -23,7 +23,7 @@ export function useAuth() {
       authStore.setUser(user)
       authStore.setToken(token)
       error.value = null
-      router.push('/blogs')
+      router.push({ name: 'blogs' })
     } catch (err) {
       console.error(err)
       if (err.response && err.response.status === 401) {
