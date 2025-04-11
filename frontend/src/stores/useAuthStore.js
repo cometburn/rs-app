@@ -3,7 +3,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia'
 export const useAuthStore = defineStore('auth', {
    state: () => ({
     user: null,
-    token: null,
+    token: localStorage.getItem('rs-token') || null,
   }),
   getters: {},
   actions: {
@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
     },
     setToken(token) {
       this.token = token
+      localStorage.setItem('rs-token', token)
     },
     clearUser() {
       this.user = null
