@@ -2,6 +2,7 @@ import {  ref } from 'vue'
 import { useAuthStore } from 'src/stores/useAuthStore'
 import { api } from 'src/boot/axios'
 import { useRouter } from 'vue-router'
+import { Notify } from 'quasar'
 
 export function useAuth() {
   const authStore = useAuthStore()
@@ -12,7 +13,6 @@ export function useAuth() {
   const signIn = async (email, password) => {
     loading.value = true
     try {
-      // Make the API call using the injected $api instance
       const response = await api.post('signin', {
         email,
         password,
@@ -23,7 +23,7 @@ export function useAuth() {
       authStore.setUser(user)
       authStore.setToken(token)
       error.value = null
-      router.push({ name: 'blogs' })
+      router.push({ name: 'blogs-child' })
     } catch (err) {
       console.error(err)
       if (err.response && err.response.status === 401) {
@@ -36,5 +36,31 @@ export function useAuth() {
     }
   }
 
-  return { signIn, loading, error }
+  const register = async ({ email, password, password_confirmation }) => {
+    try {
+      const response = await api.post('/register', {
+        email,
+        password,
+        password_confirmation
+      })
+
+      Notify.create({
+        position: 'top',
+        type: 'positive',
+        message: 'Registration successful!',
+      })
+
+      router.push({ name: 'login' })
+      return response.data
+    } catch (error) {
+      Notify.create({
+        position: 'top',
+        type: 'negative',
+        message: error.response?.data?.message || 'Registration failed',
+      })
+      throw error
+    }
+  }
+
+  return { signIn, register, loading, error }
 }

@@ -31,7 +31,6 @@ export default defineRouter(function (/* { store, ssrContext } */) {
   router.beforeEach((to, from, next) => {
     const authStore = useAuthStore()
     const isAuthenticated = authStore.token || localStorage.getItem('rs-token')
-    console.log('isAuthenticated', isAuthenticated)
   
     if (to.meta.requiresAuth && !isAuthenticated) {
       next({ name: 'login'  }) // Redirect to login if not logged in

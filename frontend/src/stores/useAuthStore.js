@@ -5,7 +5,11 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     token: localStorage.getItem('rs-token') || null,
   }),
-  getters: {},
+  getters: {
+    isAuthenticated() {
+      return this.token || localStorage.getItem('rs-token')
+    }
+  },
   actions: {
     setUser(user) {
       this.user = user

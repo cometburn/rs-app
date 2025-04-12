@@ -1,20 +1,12 @@
 <template>
- 
   <q-page class="flex flex-center">
     <q-card class="q-pa-lg" style="width: 400px; max-width: 90vw;">
       <q-card-section>
-        <div class="text-h6 text-center">Sign In</div>
+        <div class="text-h6 text-center">Register</div>
       </q-card-section>
 
       <q-card-section>
-        <q-form @submit.prevent="handleSignIn" ref="form">
-          <div v-if="error" class="col-12">
-              <q-banner inline-actions class="text-red q-px-none">
-              <q-icon name="error" size="sm" class="q-mr-sm"/>
-              <span class="text-caption">{{ error }}</span>
-            </q-banner>
-          </div>
-
+        <q-form @submit.prevent="onRegister" ref="form">
           <q-input
             v-model="email"
             label="Email"
@@ -33,12 +25,24 @@
             :rules="[val => !!val || 'Password is required']"
           />
 
-          <q-btn :loading="loading" :disabled="loading" type="submit" label="Signin" color="primary" class="full-width" />
+          <q-input
+            v-model="password_confirmation"
+            label="Confirm Password"
+            type="password"
+            outlined
+            dense
+            :rules="[
+              val => !!val || 'Please confirm password',
+              val => val === password || 'Passwords do not match'
+            ]"
+          />
+
+          <q-btn type="submit" label="Register" color="primary" class="full-width" />
         </q-form>
       </q-card-section>
 
       <q-card-section class="text-center">
-        <q-btn flat label="Register" @click.prevent="onGotoRegister" color="primary" />
+        <q-btn flat label="Back to Login" @click.prevent="onGotoLogin" color="primary" />
       </q-card-section>
     </q-card>
   </q-page>
@@ -49,17 +53,25 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from 'src/composables/useAuth'
 
+const { register } = useAuth()
 const router = useRouter();
 const email = ref('')
 const password = ref('')
-const { signIn, loading, error } = useAuth()
+const password_confirmation = ref('')
+const form = ref(null)
 
-const handleSignIn = async () => {
-  await signIn(email.value, password.value)
+const onRegister = async () => {
+  if (!(await form.value.validate())) return
+
+  await register({
+    email: email.value,
+    password: password.value,
+    password_confirmation: password_confirmation.value
+  })
 }
 
-const onGotoRegister = () => {
-  router.push({ name: 'register' })
+const onGotoLogin = () => {
+  router.push({ name: 'login' })
 }
 
 const emailRule = value => {
