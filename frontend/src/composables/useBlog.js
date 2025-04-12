@@ -8,6 +8,22 @@ export default function useBlog() {
   const blog = computed(() => blogStore.blog);
   const blogs = computed(() => blogStore.blogs);
 
+  const searchBlogs = async (str) => {
+    try {
+      const response = await api.get('/blogs', {
+        params: {
+          search: str
+        }
+      });
+
+      blogStore.setBlogs(response.data.blogs); 
+    } catch (error) {
+      blogStore.setErrorMessage('Error fetching blogs');
+      console.error('Error fetching blogs:', error);
+    }
+  };
+
+
   const fetchBlogs = async () => {
     try {
       const response = await api.get('/blogs');
@@ -87,6 +103,7 @@ export default function useBlog() {
     blogs,
     successMessage: blogStore.successMessage,
     errorMessage: blogStore.errorMessage,
+    searchBlogs,
     fetchBlogs,
     fetchBlog,
     createBlog,

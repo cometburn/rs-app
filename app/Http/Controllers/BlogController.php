@@ -11,9 +11,14 @@ class BlogController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = Blog::all();
+        $search = $request->query('search');
+
+        $blogs = Blog::when($search, function ($query, $search) {
+            $query->where('title', 'like', '%' . $search . '%');
+        })->get();
+
         return response()->json([
             'blogs' => $blogs
          ], 200);

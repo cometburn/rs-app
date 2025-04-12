@@ -22,6 +22,16 @@
               row-key="id"
               :pagination="initialPagination"
             >
+              <template v-slot:top> 
+                <q-input
+                  v-model="search"
+                  label="Search"
+                  outlined
+                  dense
+                  class="full-width"
+                  style="width: 100%"
+                />
+              </template>
               <template v-slot:body-cell-actions="props">
                 <q-td :props="props">
                   <q-btn dense flat icon="more_vert" @click.stop>
@@ -64,18 +74,20 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue'
+import { ref, watch, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router';
 import useBlog from 'src/composables/useBlog'; 
 
 import AddModal from 'src/components/AddModal.vue'
 import EditModal from 'src/components/EditModal.vue'
 
-const { blogs, fetchBlogs, changeStatus, archiveBlog } = useBlog();
+const { blogs, searchBlogs, fetchBlogs, changeStatus, archiveBlog } = useBlog();
 const router = useRouter();
 const isAddModalOpen = ref(false)
 let isEditModalOpen = ref(false)
 let selectedBlog = ref()
+const search = ref('')
+const timeout = ref(null)
 
 const initialPagination = ref({
   sortBy: 'desc',
@@ -111,4 +123,14 @@ const onEditBlog = async (row) => {
   isEditModalOpen.value = true
   selectedBlog.value = row
 }
+
+watch(search, (newVal) => {
+  if (timeout.value) {
+    clearTimeout(timeout.value)
+  }
+
+  timeout.value = setTimeout(async () => {
+    await searchBlogs(newVal)
+  }, 500)
+})
 </script>
